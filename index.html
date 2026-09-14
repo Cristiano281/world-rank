@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>World Rank — Pay to rank</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<!-- Sandbox Client ID (World Rank app) — swap for the Live Client ID before going live -->
+<script src="https://www.paypal.com/sdk/js?client-id=BAA0GXcpZ6p0H-6Iaxm7Uu_MSBTV5K7uuhAqBRDTXjRFApKmrGJUuhvXyMUn_aw-g9nrp-dWBjDRdrrhvs&currency=USD"></script>
+<style>
+  :root{
+    --bg:#16151A; --bg-raised:#1E1D24; --parchment:#F4EFE4; --parchment-dim:#B7B2A6;
+    --gold:#C9A24B; --silver:#ADA9A0; --bronze:#B0693B; --rule:#35333C;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{background:var(--bg);color:var(--parchment);font-family:'Inter',sans-serif;line-height:1.5;}
+  h1,h2,h3{font-family:'Fraunces',serif;font-weight:600;margin:0;}
+  .wrap{max-width:920px;margin:0 auto;padding:0 24px;}
+  header{padding:28px 0 20px;border-bottom:1px solid var(--rule);}
+  header .wrap{display:flex;align-items:center;justify-content:space-between;}
+  .logo{font-size:22px;} .logo span{color:var(--gold);}
+  .cta-top{background:var(--gold);color:#1A1810;border:none;padding:10px 18px;border-radius:3px;font-weight:600;font-size:14px;cursor:pointer;}
+  .hero{padding:64px 0 40px;} .hero h1{font-size:44px;line-height:1.12;max-width:620px;}
+  .hero p.sub{color:var(--parchment-dim);font-size:17px;max-width:520px;margin-top:16px;}
+  .podium-section{padding:20px 0 56px;}
+  .podium{display:flex;align-items:flex-end;gap:14px;margin-top:32px;}
+  .pod-card{flex:1;background:var(--bg-raised);border-top:3px solid var(--rule);padding:22px 16px 20px;}
+  .pod-card .rank-num{font-family:'Fraunces',serif;font-size:15px;color:var(--parchment-dim);display:block;margin-bottom:10px;}
+  .pod-card .proj-name{font-size:19px;font-weight:600;display:block;margin-bottom:6px;}
+  .pod-card .proj-desc{font-size:13px;color:var(--parchment-dim);display:block;margin-bottom:16px;min-height:36px;}
+  .pod-card .amount{font-family:'Fraunces',serif;font-size:24px;display:block;}
+  .pod-card .amount small{font-size:13px;font-family:'Inter',sans-serif;color:var(--parchment-dim);font-weight:400;}
+  #p1{border-top-color:var(--gold);transform:translateY(-18px);padding-top:30px;} #p1 .amount{color:var(--gold);}
+  #p2{border-top-color:var(--silver);} #p2 .amount{color:var(--silver);}
+  #p3{border-top-color:var(--bronze);} #p3 .amount{color:var(--bronze);}
+  .ledger-section{padding:8px 0 60px;}
+  .ledger-head{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px;}
+  .ledger-head h2{font-size:22px;} .ledger-note{font-size:13px;color:var(--parchment-dim);}
+  .ledger{border-top:1px solid var(--rule);}
+  .row{display:flex;align-items:center;gap:16px;padding:16px 0;border-bottom:1px solid var(--rule);position:relative;}
+  .row .rank{font-family:'Fraunces',serif;font-size:18px;color:var(--parchment-dim);width:28px;flex-shrink:0;}
+  .row .info{flex:1;min-width:0;} .row .info .name{font-weight:600;font-size:15px;}
+  .row .info .desc{font-size:13px;color:var(--parchment-dim);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .row .bar-track{position:absolute;left:0;bottom:0;height:2px;background:var(--rule);width:100%;}
+  .row .bar-fill{position:absolute;left:0;bottom:0;height:2px;background:var(--gold);}
+  .row .amount-col{text-align:right;flex-shrink:0;} .row .amount-col .val{font-family:'Fraunces',serif;font-size:17px;}
+  .row .boost{background:none;border:1px solid var(--rule);color:var(--parchment-dim);font-size:12px;padding:6px 10px;border-radius:3px;cursor:pointer;margin-left:14px;}
+  .row .boost:hover{border-color:var(--gold);color:var(--gold);}
+  .submit-section{padding:50px 0 70px;border-top:1px solid var(--rule);}
+  .submit-section h2{font-size:24px;margin-bottom:8px;}
+  .submit-section p.sub{color:var(--parchment-dim);font-size:14px;margin-bottom:28px;max-width:520px;}
+  form{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+  form .full{grid-column:1/-1;}
+  label{font-size:12px;color:var(--parchment-dim);display:block;margin-bottom:6px;}
+  input,textarea{width:100%;background:var(--bg-raised);border:1px solid var(--rule);color:var(--parchment);padding:11px 12px;border-radius:3px;font-family:'Inter',sans-serif;font-size:14px;}
+  input:focus,textarea:focus{outline:2px solid var(--gold);outline-offset:1px;border-color:var(--gold);}
+  textarea{resize:vertical;min-height:64px;}
+  #paypal-button-container{grid-column:1/-1;margin-top:6px;min-height:45px;}
+  .form-note{grid-column:1/-1;font-size:12px;color:var(--parchment-dim);margin-top:4px;}
+  .status-msg{grid-column:1/-1;font-size:13px;padding:10px 0;}
+  .status-msg.error{color:#E39383;} .status-msg.success{color:var(--gold);}
+  footer{border-top:1px solid var(--rule);padding:26px 0 40px;color:var(--parchment-dim);font-size:12px;}
+  .featured-section{padding:56px 0 20px;}
+  .featured-card{
+    background:var(--bg-raised);
+    border:1px solid var(--rule);
+    border-radius:4px;
+    overflow:hidden;
+  }
+  .featured-img{width:100%;display:block;}
+  .featured-body{padding:32px 28px 36px;}
+  .featured-eyebrow{
+    font-size:12px;
+    letter-spacing:1.5px;
+    text-transform:uppercase;
+    color:var(--gold);
+    margin-bottom:10px;
+  }
+  .featured-body h2{font-size:28px;margin-bottom:4px;}
+  .featured-body .tagline{color:var(--parchment-dim);font-size:15px;font-style:italic;margin-bottom:20px;}
+  .featured-body p{font-size:14.5px;color:var(--parchment-dim);margin:0 0 14px;line-height:1.65;}
+  .featured-body p strong{color:var(--parchment);font-weight:600;}
+  .featured-stats{
+    display:flex;gap:24px;margin:22px 0 26px;padding-top:20px;border-top:1px solid var(--rule);
+  }
+  .featured-stats div{font-family:'Fraunces',serif;font-size:20px;color:var(--gold);}
+  .featured-stats span{display:block;font-family:'Inter',sans-serif;font-size:11px;color:var(--parchment-dim);margin-top:2px;font-weight:400;}
+  .featured-form{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:8px;}
+  .featured-form .full{grid-column:1/-1;}
+  #featuredPaypalButton{grid-column:1/-1;margin-top:4px;min-height:45px;}
+  .waitlist-note{grid-column:1/-1;font-size:12px;color:var(--parchment-dim);margin-top:2px;}
+  @media (max-width:640px){
+    .hero h1{font-size:32px;} .podium{flex-direction:column;} #p1{transform:none;}
+    form{grid-template-columns:1fr;} .row .info .desc{display:none;}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <div class="logo">World <span>Rank</span></div>
+    <button class="cta-top" onclick="document.getElementById('submit').scrollIntoView({behavior:'smooth'})">List your project</button>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="wrap">
+    <h1>The rule is simple: whoever pays more, shows up first.</h1>
+    <p class="sub">List your project, choose how much to invest in visibility, and move up the board. No votes, no curation — position is set by what's paid.</p>
+  </div>
+</section>
+
+<section class="featured-section">
+  <div class="wrap">
+    <div class="featured-card">
+      <img src="/images/heritage-watch.png" alt="Heritage Watch — Lady and Gent editions" class="featured-img">
+      <div class="featured-body">
+        <div class="featured-eyebrow">Featured project · Pre-launch</div>
+        <h2>Heritage Watch</h2>
+        <p class="tagline">A timeless mechanical design.</p>
+
+        <p>Heritage Watch was born from a simple idea: bring back the feeling of a bygone era, when watches were made slowly, by hand, and built to be kept for a lifetime. Every detail — the open-heart dial, the gold-finished case, the domed sapphire crystal — was chosen to echo the golden age of watchmaking, when craftsmanship came before speed.</p>
+
+        <p>Each piece is made with genuine care, the way collector's items always are: not rushed, not mass-produced in spirit, even when made in numbers. Two versions carry this same soul forward — a mesh-strap edition designed for her, and a leather-strap edition designed for him.</p>
+
+        <p><strong>This isn't just a watch.</strong> It's meant to be the kind of object that earns its place in a drawer for decades, then gets passed on to someone else who'll understand why it mattered.</p>
+
+        <p>Heritage Watch is currently in pre-launch. Your donation doesn't reserve a specific unit — it helps bring this design to life, and adds your name to the waitlist to be notified first when it launches.</p>
+
+        <form id="featuredForm">
+          <div class="full"><label for="fEmail">Email (for the waitlist)</label><input type="email" id="fEmail" required placeholder="you@example.com"></div>
+          <div><label for="fAmount">Donation amount (USD)</label><input type="number" id="fAmount" min="1" step="0.01" value="6" required></div>
+          <div id="featuredPaypalButton"></div>
+          <div id="featuredStatus" class="status-msg"></div>
+          <p class="waitlist-note">This is a donation to support development, not a pre-order — it does not guarantee a unit or a delivery date.</p>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="podium-section">
+  <div class="wrap"><div class="podium" id="podium"></div></div>
+</section>
+
+<section class="ledger-section">
+  <div class="wrap">
+    <div class="ledger-head"><h2>Full ranking</h2><span class="ledger-note">updated live</span></div>
+    <div class="ledger" id="ledger"></div>
+  </div>
+</section>
+
+<section class="submit-section" id="submit">
+  <div class="wrap">
+    <h2>List your project</h2>
+    <p class="sub">Fill in the details, choose an amount, and pay with PayPal. Your position is set as soon as the payment is confirmed.</p>
+    <form id="projForm">
+      <div><label for="name">Project name</label><input type="text" id="name" required maxlength="60"></div>
+      <div><label for="amount">Amount to invest (USD)</label><input type="number" id="amount" min="1" step="0.01" required></div>
+      <div class="full"><label for="desc">Short description</label><textarea id="desc" maxlength="140" required></textarea></div>
+      <div class="full"><label for="link">Project link (optional)</label><input type="text" id="link" placeholder="https://"></div>
+      <div id="paypal-button-container"></div>
+      <div id="statusMsg" class="status-msg"></div>
+      <p class="form-note">Payments are processed securely through PayPal. Your project appears in the ranking as soon as the payment is confirmed.</p>
+    </form>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">World Rank — position is determined by amount invested in visibility, not an endorsement of quality.</div>
+</footer>
+
+<script>
+const medals = ["1st","2nd","3rd"];
+let currentPaypalButtons = null;
+
+async function fetchProjects(){
+  const res = await fetch('/api/projects');
+  return res.json();
+}
+
+function escapeHtml(str){
+  const d = document.createElement('div');
+  d.textContent = str;
+  return d.innerHTML;
+}
+
+async function render(){
+  const projects = await fetchProjects();
+  if(projects.length === 0) return;
+  const top3 = projects.slice(0,3);
+  const rest = projects.slice(3);
+  const maxAmount = projects[0].amount;
+
+  document.getElementById('podium').innerHTML = top3.map((p,i)=>`
+    <div class="pod-card" id="p${i+1}">
+      <span class="rank-num">${medals[i]} place</span>
+      <span class="proj-name">${escapeHtml(p.name)}</span>
+      <span class="proj-desc">${escapeHtml(p.desc)}</span>
+      <span class="amount">$${p.amount.toFixed(2)}<small> invested</small></span>
+    </div>`).join('');
+
+  document.getElementById('ledger').innerHTML = rest.map((p,i)=>{
+    const pct = Math.max(4, Math.round((p.amount/maxAmount)*100));
+    return `
+    <div class="row">
+      <span class="rank">${i+4}</span>
+      <div class="info">
+        <div class="name">${escapeHtml(p.name)}</div>
+        <div class="desc">${escapeHtml(p.desc)}</div>
+      </div>
+      <div class="amount-col"><span class="val">$${p.amount.toFixed(2)}</span></div>
+      <button class="boost" data-id="${p.id}">Boost</button>
+      <div class="bar-track"><div class="bar-fill" style="width:${pct}%"></div></div>
+    </div>`;
+  }).join('');
+
+  document.querySelectorAll('.boost').forEach(btn=>{
+    btn.addEventListener('click', ()=> startBoost(btn.dataset.id));
+  });
+}
+
+function setStatus(msg, type){
+  const el = document.getElementById('statusMsg');
+  el.textContent = msg;
+  el.className = 'status-msg' + (type ? ' ' + type : '');
+}
+
+function renderPayPalButton({ amount, getPayload, projectId }){
+  const container = document.getElementById('paypal-button-container');
+  container.innerHTML = '';
+  if(!amount || amount <= 0) return;
+  if(!window.paypal){
+    setStatus('PayPal is not configured yet — add your Client ID in index.html.', 'error');
+    return;
+  }
+
+  currentPaypalButtons = window.paypal.Buttons({
+    createOrder: async () => {
+      const res = await fetch('/api/orders', {
+        method: 'POST',
+        headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({ amount })
+      });
+      const data = await res.json();
+      if(!res.ok) throw new Error(data.error || 'Could not start payment');
+      return data.id;
+    },
+    onApprove: async (data) => {
+      setStatus('Confirming payment…', '');
+      const res = await fetch(`/api/orders/${data.orderID}/capture`, {
+        method: 'POST',
+        headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({ projectId, ...getPayload() })
+      });
+      const result = await res.json();
+      if(!res.ok){
+        setStatus(result.error || 'Payment could not be completed.', 'error');
+        return;
+      }
+      setStatus('Payment confirmed — ranking updated!', 'success');
+      document.getElementById('projForm').reset();
+      document.getElementById('paypal-button-container').innerHTML = '';
+      await render();
+      document.getElementById('podium').scrollIntoView({behavior:'smooth'});
+    },
+    onError: (err) => {
+      console.error(err);
+      setStatus('Something went wrong with PayPal. Please try again.', 'error');
+    }
+  });
+  currentPaypalButtons.render('#paypal-button-container');
+}
+
+document.getElementById('amount').addEventListener('input', updateButtonForNewProject);
+document.getElementById('name').addEventListener('input', updateButtonForNewProject);
+document.getElementById('desc').addEventListener('input', updateButtonForNewProject);
+
+function updateButtonForNewProject(){
+  const amount = parseFloat(document.getElementById('amount').value);
+  const name = document.getElementById('name').value.trim();
+  const desc = document.getElementById('desc').value.trim();
+  setStatus('', '');
+  if(amount > 0 && name && desc){
+    renderPayPalButton({
+      amount,
+      projectId: null,
+      getPayload: () => ({
+        name,
+        desc,
+        link: document.getElementById('link').value.trim()
+      })
+    });
+  } else {
+    document.getElementById('paypal-button-container').innerHTML = '';
+  }
+}
+
+function startBoost(projectId){
+  const amount = parseFloat(prompt('How much would you like to add to this project (USD)?', '20'));
+  if(!amount || amount <= 0) return;
+  document.getElementById('submit').scrollIntoView({behavior:'smooth'});
+  setStatus('', '');
+  renderPayPalButton({ amount, projectId, getPayload: () => ({}) });
+}
+
+document.getElementById('fEmail').addEventListener('input', updateFeaturedButton);
+document.getElementById('fAmount').addEventListener('input', updateFeaturedButton);
+
+function setFeaturedStatus(msg, type){
+  const el = document.getElementById('featuredStatus');
+  el.textContent = msg;
+  el.className = 'status-msg' + (type ? ' ' + type : '');
+}
+
+function updateFeaturedButton(){
+  const email = document.getElementById('fEmail').value.trim();
+  const amount = parseFloat(document.getElementById('fAmount').value);
+  const container = document.getElementById('featuredPaypalButton');
+  setFeaturedStatus('', '');
+
+  if(!email || !amount || amount <= 0){
+    container.innerHTML = '';
+    return;
+  }
+  container.innerHTML = '';
+  if(!window.paypal){
+    setFeaturedStatus('PayPal is not configured yet — add your Client ID in index.html.', 'error');
+    return;
+  }
+
+  window.paypal.Buttons({
+    style: { label: 'donate' },
+    createOrder: async () => {
+      const res = await fetch('/api/orders', {
+        method: 'POST',
+        headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({ amount })
+      });
+      const data = await res.json();
+      if(!res.ok) throw new Error(data.error || 'Could not start payment');
+      return data.id;
+    },
+    onApprove: async (data) => {
+      setFeaturedStatus('Confirming payment…', '');
+      const res = await fetch(`/api/orders/${data.orderID}/capture`, {
+        method: 'POST',
+        headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({
+          name: 'Heritage Watch',
+          desc: 'A timeless mechanical design, inspired by the golden age of watchmaking.',
+          email
+        })
+      });
+      const result = await res.json();
+      if(!res.ok){
+        setFeaturedStatus(result.error || 'Payment could not be completed.', 'error');
+        return;
+      }
+      setFeaturedStatus("You're on the waitlist — thank you for your support!", 'success');
+      document.getElementById('featuredForm').reset();
+      document.getElementById('fAmount').value = 6;
+      container.innerHTML = '';
+      await render();
+      document.getElementById('podium').scrollIntoView({behavior:'smooth'});
+    },
+    onError: (err) => {
+      console.error(err);
+      setFeaturedStatus('Something went wrong with PayPal. Please try again.', 'error');
+    }
+  }).render('#featuredPaypalButton');
+}
+
+document.getElementById('featuredForm').addEventListener('submit', (e) => e.preventDefault());
+
+document.getElementById('projForm').addEventListener('submit', (e) => e.preventDefault());
+
+render();
+</script>
+
+</body>
+</html>
